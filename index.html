@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Webhook by Techify</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.0/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        // Testar webhook
+        function testWebhook() {
+            const testData = {
+                tipo: 'teste',
+                sistema: 'Simple Webhook by Techify',
+                mensagem: 'Este é um teste de webhook',
+                timestamp: new Date().toISOString(),
+                evento: 'teste_conexao'
+            };
+            
+            sendWebhook(testData);
+        }
+
+        // Mostrar dados de debug
+        function showDebugData(data) {
+            const debugInfo = document.getElementById('debugInfo');
+            const debugData = document.getElementById('debugData');
+            
+            debugData.textContent = JSON.stringify(data, null, 2);
+            debugInfo.style.display = 'block';
+            
+            // Esconder após 10 segundos
+            setTimeout(() => {
+                debugInfo.style.display = 'none';
+            }, 10000);
+        }
+
+        // Limpar formulários manualmente
+        function clearHotelForm() {
+            console.log('Limpando formulário do hotel...');
+            document.getElementById('hotelForm').reset();
+        }
+
+        function clearEcommerceForm() {
+            console.log('Limpando formulário do e-commerce...');
+            document.getElementById('ecommerceForm').reset();
+        }
+
+        // Testar webhook
+        function testWebhook() {
+            const testData = {
+                tipo: 'teste',
+                sistema: 'Simple Webhook by Techify',
+                mensagem: 'Este é um teste de webhook',
+                timestamp: new Date().toISOString(),
+                evento: 'teste_conexao'
+            };
+            
+            sendWebhook(testData);
+        }
+
+        // Mostrar dados de debug
+        function showDebugData(data) {
+            const debugInfo = document.getElementById('debugInfo');
+            const debugData = document.getElementById('debugData');
+            
+            debugData.textContent = JSON.stringify(data, null, 2);
+            debugInfo.style.display = 'block';
+            
+            // Esconder após 10 segundos
+            setTimeout(() => {
+                debugInfo.style.display = 'none';
+            }, 10000);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4c6ef5 0%, #3b4cb8 100%);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(76, 110, 245, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        .webhook-config {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .webhook-config h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .webhook-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .webhook-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .webhook-input:focus {
+            outline: none;
+            border-color: #4c6ef5;
+            box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.1);
+        }
+
+        .webhook-input.error {
+            border-color: #e74c3c;
+        }
+
+        .save-btn {
+            padding: 12px 20px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .save-btn:hover {
+            background: #229954;
+            transform: translateY(-1px);
+        }
+
+        .section-tabs {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .tab-header {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 15px;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .tab-btn.hotel {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .tab-btn.hotel:hover, .tab-btn.hotel.active {
+            background: #e55656;
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.ecommerce {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        .tab-btn.ecommerce:hover, .tab-btn.ecommerce.active {
+            background: #45b7aa;
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .form-group input {
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4c6ef5;
+            box-shadow: 0 0 0 3px rgba(76, 110, 245, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.8em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .credit-card-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .credit-card-section h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .hotel-submit {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .hotel-submit:hover {
+            background: #e55656;
+            transform: translateY(-2px);
+        }
+
+        .ecommerce-submit {
+            background: #4ecdc4;
+            color: white;
+        }
+
+        .ecommerce-submit:hover {
+            background: #45b7aa;
+            transform: translateY(-2px);
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #4c6ef5 0%, #3b4cb8 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr 120px;
+            gap: 15px;
+            font-weight: 600;
+        }
+
+        .table-row {
+            padding: 15px;
+            border-bottom: 1px solid #f8f9fa;
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr 120px;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .status-indicator {
+            display: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 1.5em;
+        }
+
+        .modal-success {
+            color: #27ae60;
+        }
+
+        .modal-error {
+            color: #e74c3c;
+        }
+
+        .close-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .card-hint {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 5px;
+            font-size: 0.85em;
+            color: #1565c0;
+        }
+
+        @media (max-width: 768px) {
+            .webhook-input-group {
+                flex-direction: column;
+            }
+            
+            .webhook-input {
+                min-width: 100%;
+            }
+            
+            .tab-header {
+                flex-direction: column;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Simple Webhook by Techify</h1>
+        </div>
+
+        <div class="webhook-config">
+            <h3>🔗 Configuração do Webhook URL</h3>
+            <div class="webhook-input-group">
+                <input type="url" id="webhookUrl" class="webhook-input" placeholder="https://webhook.site/seu-id-aqui" value="">
+                <button onclick="saveWebhookUrl()" class="save-btn">💾 Salvar URL</button>
+            </div>
+            <div class="error-message" id="urlError">Por favor, insira uma URL válida</div>
+            <div id="webhookStatus" class="status-indicator"></div>
+        </div>
+
+        <div class="section-tabs">
+            <div class="tab-header">
+                <button onclick="showTab('hotel')" class="tab-btn hotel active" id="hotelTab">🏨 Sistema Hotel</button>
+                <button onclick="showTab('ecommerce')" class="tab-btn ecommerce" id="ecommerceTab">🛒 E-commerce</button>
+            </div>
+
+            <!-- Hotel Tab -->
+            <div id="hotelContent" class="tab-content active">
+                <div class="form-section">
+                    <h2>🏨 Sistema de Controle de Hóspedes</h2>
+                    <form id="hotelForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="hotelNome">Nome Completo:</label>
+                                <input type="text" id="hotelNome" required>
+                                <div class="error-message" id="hotelNomeError">Nome é obrigatório</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="hotelCpf">CPF:</label>
+                                <input type="text" id="hotelCpf" placeholder="000.000.000-00" maxlength="14" required>
+                                <div class="error-message" id="hotelCpfError">CPF é obrigatório</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="hotelCelular">Celular:</label>
+                                <input type="text" id="hotelCelular" placeholder="(00)00000-0000" maxlength="14" required>
+                                <div class="error-message" id="hotelCelularError">Celular é obrigatório</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="hotelQuarto">Número do Quarto:</label>
+                                <input type="number" id="hotelQuarto" placeholder="101" required>
+                                <div class="error-message" id="hotelQuartoError">Número do quarto é obrigatório</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="hotelCheckin">Data Check-in:</label>
+                                <input type="date" id="hotelCheckin" required>
+                                <div class="error-message" id="hotelCheckinError">Data de check-in é obrigatória</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="hotelCheckout">Data Check-out:</label>
+                                <input type="date" id="hotelCheckout" required>
+                                <div class="error-message" id="hotelCheckoutError">Data de check-out é obrigatória</div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn hotel-submit">🛎️ Cadastrar Hóspede</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- E-commerce Tab -->
+            <div id="ecommerceContent" class="tab-content">
+                <div class="form-section">
+                    <h2>🛒 Check-out Techify</h2>
+                    
+                    <!-- Produto Principal -->
+                    <div style="background: #e8f5e8; border: 2px solid #4caf50; border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+                        <h3 style="color: #2e7d32; margin-bottom: 10px;">📚 Curso Completo de Adestramento de Cães</h3>
+                        <p style="color: #555; margin-bottom: 15px;">Aprenda técnicas profissionais para adestrar seu cão com métodos comprovados e eficazes.</p>
+                        <div style="font-size: 2em; font-weight: bold; color: #2e7d32;">R$ 99,90</div>
+                    </div>
+
+                    <form id="ecommerceForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="ecomNome">Nome Completo:</label>
+                                <input type="text" id="ecomNome" required>
+                                <div class="error-message" id="ecomNomeError">Nome é obrigatório</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="ecomEmail">Email:</label>
+                                <input type="email" id="ecomEmail" required>
+                                <div class="error-message" id="ecomEmailError">Email válido é obrigatório</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="ecomTelefone">Telefone:</label>
+                                <input type="text" id="ecomTelefone" placeholder="(00)00000-0000" maxlength="14" required>
+                                <div class="error-message" id="ecomTelefoneError">Telefone é obrigatório</div>
+                            </div>
+                        </div>
+
+                        <!-- Order Bumps -->
+                        <div style="background: #fff8e1; border: 2px solid #ffb74d; border-radius: 15px; padding: 25px; margin: 25px 0;">
+                            <h3 style="color: #f57c00; margin-bottom: 20px; text-align: center;">🎁 Ofertas Especiais - Aproveite Agora!</h3>
+                            
+                            <div style="display: grid; gap: 15px;">
+                                <!-- Order Bump 1 -->
+                                <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; background: white;">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" id="bump1" value="29.90" style="margin-right: 15px; transform: scale(1.2);">
+                                        <div style="flex: 1;">
+                                            <strong style="color: #2e7d32;">📖 E-book: Comandos Básicos (R$ 29,90)</strong>
+                                            <div style="color: #666; font-size: 0.9em;">Guia completo com 50 comandos essenciais ilustrados</div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Order Bump 2 -->
+                                <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; background: white;">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" id="bump2" value="39.90" style="margin-right: 15px; transform: scale(1.2);">
+                                        <div style="flex: 1;">
+                                            <strong style="color: #2e7d32;">🦴 Kit de Petiscos Especiais (R$ 39,90)</strong>
+                                            <div style="color: #666; font-size: 0.9em;">Petiscos naturais ideais para recompensa durante o treinamento</div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Order Bump 3 -->
+                                <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; background: white;">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" id="bump3" value="49.90" style="margin-right: 15px; transform: scale(1.2);">
+                                        <div style="flex: 1;">
+                                            <strong style="color: #2e7d32;">🔗 Coleira de Treinamento Profissional (R$ 49,90)</strong>
+                                            <div style="color: #666; font-size: 0.9em;">Coleira especial com guia retrátil para treinos seguros</div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Order Bump 4 -->
+                                <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; background: white;">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" id="bump4" value="79.90" style="margin-right: 15px; transform: scale(1.2);">
+                                        <div style="flex: 1;">
+                                            <strong style="color: #2e7d32;">🎥 Vídeos Extras: Casos Especiais (R$ 79,90)</strong>
+                                            <div style="color: #666; font-size: 0.9em;">20 vídeos exclusivos com casos reais de problemas comportamentais</div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Order Bump 5 -->
+                                <div style="border: 1px solid #ddd; border-radius: 10px; padding: 15px; background: white;">
+                                    <label style="display: flex; align-items: center; cursor: pointer;">
+                                        <input type="checkbox" id="bump5" value="149.90" style="margin-right: 15px; transform: scale(1.2);">
+                                        <div style="flex: 1;">
+                                            <strong style="color: #2e7d32;">👨‍🏫 Consultoria Particular Online (R$ 149,90)</strong>
+                                            <div style="color: #666; font-size: 0.9em;">1 sessão individual de 60min com especialista via videochamada</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Total -->
+                            <div style="margin-top: 20px; padding: 15px; background: #4caf50; color: white; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 1.1em; margin-bottom: 5px;">Total do Pedido:</div>
+                                <div id="totalPrice" style="font-size: 2em; font-weight: bold;">R$ 99,90</div>
+                            </div>
+                        </div>
+
+                        <div class="credit-card-section">
+                            <h4>💳 Dados do Cartão de Crédito</h4>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="ecomCartaoNome">Nome no Cartão:</label>
+                                    <input type="text" id="ecomCartaoNome" required>
+                                    <div class="error-message" id="ecomCartaoNomeError">Nome no cartão é obrigatório</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ecomCartaoNumero">Número do Cartão:</label>
+                                    <input type="text" id="ecomCartaoNumero" placeholder="0000-0000-0000-0000" maxlength="19" required>
+                                    <div class="card-hint">💡 Use 4242-4242-4242-4242 para aprovado ou 4242-4242-4242-4243 para recusado</div>
+                                    <div class="error-message" id="ecomCartaoNumeroError">Número do cartão é obrigatório</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ecomCartaoVencimento">Vencimento:</label>
+                                    <input type="text" id="ecomCartaoVencimento" placeholder="MM/AA" maxlength="5" required>
+                                    <div class="error-message" id="ecomCartaoVencimentoError">Vencimento é obrigatório</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="ecomCartaoCvv">CVV:</label>
+                                    <input type="text" id="ecomCartaoCvv" placeholder="000" maxlength="3" required>
+                                    <div class="error-message" id="ecomCartaoCvvError">CVV é obrigatório</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn ecommerce-submit">💰 Finalizar Compra</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <p id="modalMessage"></p>
+            <button onclick="closeModal()" class="close-btn">Fechar</button>
+        </div>
+    </div>
+
+    <script>
+        // Carregar configurações salvas
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM carregado, iniciando configurações...');
+            
+            const savedUrl = localStorage.getItem('webhookUrl');
+            if (savedUrl) {
+                document.getElementById('webhookUrl').value = savedUrl;
+                showStatus('Webhook URL carregada do cache', 'success');
+            }
+
+            // Aplicar máscaras após DOM carregar
+            setupMasks();
+            setupFormEvents();
+            
+            console.log('Configurações concluídas!');
+        });
+
+        // Configurar máscaras
+        function setupMasks() {
+            // Máscara CPF
+            document.getElementById('hotelCpf').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 11) {
+                    value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                }
+                e.target.value = value;
+            });
+
+            // Máscara celular hotel
+            document.getElementById('hotelCelular').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 11) {
+                    value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1)$2-$3');
+                }
+                e.target.value = value;
+            });
+
+            // Máscara telefone e-commerce
+            document.getElementById('ecomTelefone').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 11) {
+                    value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1)$2-$3');
+                }
+                e.target.value = value;
+            });
+
+            // Máscara cartão
+            document.getElementById('ecomCartaoNumero').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 16) {
+                    value = value.replace(/(\d{4})(\d{4})(\d{4})(\d{4})/, '$1-$2-$3-$4');
+                }
+                e.target.value = value;
+            });
+
+            // Máscara vencimento
+            document.getElementById('ecomCartaoVencimento').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 4) {
+                    value = value.replace(/(\d{2})(\d{2})/, '$1/$2');
+                }
+                e.target.value = value;
+            });
+        }
+
+        // Configurar eventos dos formulários
+        function setupFormEvents() {
+            // Event listeners para order bumps
+            setupOrderBumps();
+
+            // Formulário Hotel
+            document.getElementById('hotelForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!validateHotelForm()) {
+                    return;
+                }
+                
+                const data = {
+                    tipo: 'hotel',
+                    sistema: 'Simple Webhook by Techify',
+                    dados: {
+                        nome: document.getElementById('hotelNome').value,
+                        cpf: document.getElementById('hotelCpf').value,
+                        celular: document.getElementById('hotelCelular').value,
+                        checkin: document.getElementById('hotelCheckin').value,
+                        checkout: document.getElementById('hotelCheckout').value,
+                        quarto: parseInt(document.getElementById('hotelQuarto').value)
+                    },
+                    timestamp: new Date().toISOString(),
+                    evento: 'cadastro_hospede'
+                };
+                
+                sendWebhook(data);
+                showModal('Cadastro Realizado!', 'Hóspede cadastrado com sucesso. Webhook enviado!', 'success');
+            });
+
+            // Formulário E-commerce
+            document.getElementById('ecommerceForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!validateEcommerceForm()) {
+                    return;
+                }
+                
+                const cartaoNumero = document.getElementById('ecomCartaoNumero').value;
+                const aprovado = cartaoNumero === '4242-4242-4242-4242';
+                
+                // Coletar order bumps selecionados
+                const orderBumps = getSelectedOrderBumps();
+                const totalValue = calculateTotal();
+                
+                const data = {
+                    tipo: 'ecommerce',
+                    sistema: 'Simple Webhook by Techify',
+                    produto_principal: {
+                        nome: 'Curso Completo de Adestramento de Cães',
+                        preco: 99.90
+                    },
+                    order_bumps: orderBumps,
+                    valor_total: totalValue,
+                    dados: {
+                        cliente: {
+                            nome: document.getElementById('ecomNome').value,
+                            email: document.getElementById('ecomEmail').value,
+                            telefone: document.getElementById('ecomTelefone').value
+                        },
+                        pagamento: {
+                            metodo: 'cartao_credito',
+                            cartao: {
+                                nome: document.getElementById('ecomCartaoNome').value,
+                                numero: cartaoNumero,
+                                vencimento: document.getElementById('ecomCartaoVencimento').value,
+                                cvv: document.getElementById('ecomCartaoCvv').value
+                            }
+                        }
+                    },
+                    status: aprovado ? 'aprovado' : 'recusado',
+                    timestamp: new Date().toISOString(),
+                    evento: 'finalizar_compra'
+                };
+                
+                sendWebhook(data);
+                
+                if (aprovado) {
+                    showModal('Compra Aprovada! ✅', `Pagamento de R$ ${totalValue.toFixed(2).replace('.', ',')} processado com sucesso. Webhook enviado!`, 'success');
+                } else {
+                    showModal('Compra Recusada! ❌', 'Cartão recusado. Webhook enviado!', 'error');
+                }
+            });
+        }
+
+        // Configurar order bumps
+        function setupOrderBumps() {
+            const bumps = ['bump1', 'bump2', 'bump3', 'bump4', 'bump5'];
+            
+            bumps.forEach(bumpId => {
+                document.getElementById(bumpId).addEventListener('change', updateTotal);
+            });
+        }
+
+        // Calcular total
+        function calculateTotal() {
+            let total = 99.90; // Produto principal
+            
+            const bumps = ['bump1', 'bump2', 'bump3', 'bump4', 'bump5'];
+            
+            bumps.forEach(bumpId => {
+                const checkbox = document.getElementById(bumpId);
+                if (checkbox.checked) {
+                    total += parseFloat(checkbox.value);
+                }
+            });
+            
+            return total;
+        }
+
+        // Atualizar display do total
+        function updateTotal() {
+            const total = calculateTotal();
+            document.getElementById('totalPrice').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        // Obter order bumps selecionados
+        function getSelectedOrderBumps() {
+            const orderBumps = [];
+            
+            const bumpData = [
+                { id: 'bump1', nome: 'E-book: Comandos Básicos', preco: 29.90 },
+                { id: 'bump2', nome: 'Kit de Petiscos Especiais', preco: 39.90 },
+                { id: 'bump3', nome: 'Coleira de Treinamento Profissional', preco: 49.90 },
+                { id: 'bump4', nome: 'Vídeos Extras: Casos Especiais', preco: 79.90 },
+                { id: 'bump5', nome: 'Consultoria Particular Online', preco: 149.90 }
+            ];
+            
+            bumpData.forEach(bump => {
+                const checkbox = document.getElementById(bump.id);
+                if (checkbox.checked) {
+                    orderBumps.push({
+                        nome: bump.nome,
+                        preco: bump.preco
+                    });
+                }
+            });
+            
+            return orderBumps;
+        }
+
+        // Validação de URL
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        // Validação de email
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Salvar URL do webhook
+        function saveWebhookUrl() {
+            console.log('Salvando URL do webhook...');
+            const url = document.getElementById('webhookUrl').value;
+            const urlInput = document.getElementById('webhookUrl');
+            const errorDiv = document.getElementById('urlError');
+            
+            if (!url) {
+                showError(urlInput, errorDiv, 'URL é obrigatória');
+                return;
+            }
+            
+            if (!isValidUrl(url)) {
+                showError(urlInput, errorDiv, 'Por favor, digite uma URL válida (ex: https://webhook.site/seu-id)');
+                return;
+            }
+            
+            hideError(urlInput, errorDiv);
+            localStorage.setItem('webhookUrl', url);
+            showStatus('URL do webhook salva com sucesso!', 'success');
+            console.log('URL salva:', url);
+        }
+
+        // Mostrar dados de debug
+        function showDebugData(data) {
+            const debugInfo = document.getElementById('debugInfo');
+            const debugData = document.getElementById('debugData');
+            
+            debugData.textContent = JSON.stringify(data, null, 2);
+            debugInfo.style.display = 'block';
+            
+            // Esconder após 10 segundos
+            setTimeout(() => {
+                debugInfo.style.display = 'none';
+            }, 10000);
+        }
+
+        // Mostrar/ocultar erros
+        function showError(input, errorDiv, message) {
+            input.classList.add('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError(input, errorDiv) {
+            input.classList.remove('error');
+            errorDiv.style.display = 'none';
+        }
+
+        // Mostrar status
+        function showStatus(message, type) {
+            const status = document.getElementById('webhookStatus');
+            status.textContent = message;
+            status.className = `status-indicator status-${type}`;
+            status.style.display = 'block';
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+
+        // Gerenciar abas
+        function showTab(tab) {
+            console.log('Mudando para aba:', tab);
+            // Reset abas
+            document.getElementById('hotelTab').classList.remove('active');
+            document.getElementById('ecommerceTab').classList.remove('active');
+            document.getElementById('hotelContent').classList.remove('active');
+            document.getElementById('ecommerceContent').classList.remove('active');
+            
+            // Ativar aba selecionada
+            if (tab === 'hotel') {
+                document.getElementById('hotelTab').classList.add('active');
+                document.getElementById('hotelContent').classList.add('active');
+            } else {
+                document.getElementById('ecommerceTab').classList.add('active');
+                document.getElementById('ecommerceContent').classList.add('active');
+            }
+        }
+
+        // Validação do formulário do hotel
+        function validateHotelForm() {
+            let isValid = true;
+            
+            const fields = [
+                { id: 'hotelNome', error: 'hotelNomeError', message: 'Nome é obrigatório' },
+                { id: 'hotelCpf', error: 'hotelCpfError', message: 'CPF é obrigatório' },
+                { id: 'hotelCelular', error: 'hotelCelularError', message: 'Celular é obrigatório' },
+                { id: 'hotelQuarto', error: 'hotelQuartoError', message: 'Número do quarto é obrigatório' },
+                { id: 'hotelCheckin', error: 'hotelCheckinError', message: 'Data de check-in é obrigatória' },
+                { id: 'hotelCheckout', error: 'hotelCheckoutError', message: 'Data de check-out é obrigatória' }
+            ];
+            
+            fields.forEach(field => {
+                const input = document.getElementById(field.id);
+                const errorDiv = document.getElementById(field.error);
+                
+                if (!input.value.trim()) {
+                    showError(input, errorDiv, field.message);
+                    isValid = false;
+                } else {
+                    hideError(input, errorDiv);
+                }
+            });
+            
+            return isValid;
+        }
+
+        // Validação do formulário de e-commerce
+        function validateEcommerceForm() {
+            let isValid = true;
+            
+            const fields = [
+                { id: 'ecomNome', error: 'ecomNomeError', message: 'Nome é obrigatório' },
+                { id: 'ecomTelefone', error: 'ecomTelefoneError', message: 'Telefone é obrigatório' },
+                { id: 'ecomCartaoNome', error: 'ecomCartaoNomeError', message: 'Nome no cartão é obrigatório' },
+                { id: 'ecomCartaoNumero', error: 'ecomCartaoNumeroError', message: 'Número do cartão é obrigatório' },
+                { id: 'ecomCartaoVencimento', error: 'ecomCartaoVencimentoError', message: 'Vencimento é obrigatório' },
+                { id: 'ecomCartaoCvv', error: 'ecomCartaoCvvError', message: 'CVV é obrigatório' }
+            ];
+            
+            fields.forEach(field => {
+                const input = document.getElementById(field.id);
+                const errorDiv = document.getElementById(field.error);
+                
+                if (!input.value.trim()) {
+                    showError(input, errorDiv, field.message);
+                    isValid = false;
+                } else {
+                    hideError(input, errorDiv);
+                }
+            });
+            
+            // Validação específica do email
+            const emailInput = document.getElementById('ecomEmail');
+            const emailError = document.getElementById('ecomEmailError');
+            
+            if (!emailInput.value.trim()) {
+                showError(emailInput, emailError, 'Email é obrigatório');
+                isValid = false;
+            } else if (!isValidEmail(emailInput.value)) {
+                showError(emailInput, emailError, 'Por favor, digite um email válido');
+                isValid = false;
+            } else {
+                hideError(emailInput, emailError);
+            }
+            
+            return isValid;
+        }
+
+        // Enviar webhook
+        async function sendWebhook(data) {
+            const webhookUrl = localStorage.getItem('webhookUrl');
+            
+            if (!webhookUrl) {
+                showStatus('Configure uma URL de webhook primeiro!', 'error');
+                return;
+            }
+
+            try {
+                console.log('Enviando dados:', JSON.stringify(data, null, 2));
+                
+                // Primeiro, tenta com Axios
+                try {
+                    const response = await axios({
+                        method: 'POST',
+                        url: webhookUrl,
+                        data: data,
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        timeout: 10000
+                    });
+                    
+                    console.log('Webhook enviado com Axios:', response);
+                    showStatus('Webhook enviado com sucesso via Axios!', 'success');
+                    return;
+                    
+                } catch (axiosError) {
+                    console.log('Erro com Axios, tentando com fetch:', axiosError);
+                    
+                    // Se Axios falhar, tenta com fetch
+                    const response = await fetch(webhookUrl, {
+                        method: 'POST',
+                        mode: 'no-cors', // Isso pode ajudar com CORS
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    
+                    console.log('Webhook enviado com fetch:', response);
+                    showStatus('Webhook enviado com sucesso via fetch!', 'success');
+                }
+                
+            } catch (error) {
+                console.error('Erro completo ao enviar webhook:', error);
+                
+                // Última tentativa - fetch simples
+                try {
+                    await fetch(webhookUrl, {
+                        method: 'POST',
+                        body: JSON.stringify(data),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    console.log('Webhook enviado na última tentativa');
+                    showStatus('Webhook enviado (tentativa simples)!', 'success');
+                } catch (finalError) {
+                    console.error('Erro final:', finalError);
+                    showStatus('Erro ao enviar webhook. Dados logados no console.', 'error');
+                }
+            }
+        }
+
+        // Modal
+        function showModal(title, message, type) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('modalTitle').className = `modal-${type}`;
+            document.getElementById('resultModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').style.display = 'none';
+        }
+
+        // Fechar modal clicando fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('resultModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
